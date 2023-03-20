@@ -16,6 +16,7 @@
             this.serviceAccessorDictionary = serviceAccessorDictionary;
         }
 
+        /// <exception cref="ArgumentNullException"></exception>
         public ServiceProvider(IDictionary<int, IServiceAccessor> serviceAccessorDictionary, IEnumerable<IRule> ruleCollection)
         {
             ArgumentNullException.ThrowIfNull(serviceAccessorDictionary);
@@ -32,8 +33,20 @@
             EnsureCompliance(ruleCollection);
         }
 
-        public object? GetService(Type serviceType) =>
-            serviceAccessorDictionary.TryGetValue(serviceType.GetHashCode(), out IServiceAccessor? factory) ? factory.GetService(this) : null;
+
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException"></exception>
+        public object? GetService(Type serviceType)
+        {
+            ArgumentNullException.ThrowIfNull(serviceType);
+
+            if (!serviceType.IsInterface && !serviceType.IsClass)
+            {
+                throw new ArgumentException($"The {serviceType.FullName} is not interface or class. The service must have a reference type.");
+            }
+
+            return serviceAccessorDictionary.TryGetValue(serviceType.GetHashCode(), out IServiceAccessor? factory) ? factory.GetService(this) : null;
+        }
 
         private static void EnsureCompliance(IEnumerable<IRule> ruleCollection)
         {
