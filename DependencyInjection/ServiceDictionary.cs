@@ -1,7 +1,7 @@
 ﻿namespace DependencyInjection.Extensions
 {
     using Accessors;
-    using DependencyInjection.Rules;
+    using Rules;
 
     public class ServiceDictionary : Dictionary<int, IServiceAccessor>
     {
